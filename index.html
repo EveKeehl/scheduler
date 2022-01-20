@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Планировщик</title>
+    <link rel="stylesheet" href="reset.css ">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="src/icon/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<section class="scheduler">
+    <div class="diagram">
+        <div class="nav">
+            <button class="button-nav prev">Назад</button>
+            <button class="button-nav next">Вперед</button>
+        </div>
+
+        <div class="wrapper">
+            <div class="date-box" id="date-box">
+                <!--<div class="date-item">1.02</div>-->
+            </div>
+
+            <div class="name-box" id="name-box">
+                <!--<div class="name-item">Сергей</div>-->
+            </div>
+
+            <div class="tasks-box" id="tasks-box">
+                <!--<div class="task-item">Задача</div>-->
+            </div>
+
+        </div>
+    </div>
+    <div class="backlog">
+        <div class="backlog-title">Backlog</div>
+
+        <div class="backlog-search">
+            <input type="search" id="search" name="search" placeholder="Поиск">
+            <button><img src="src/icon/loupe.svg" alt="Лупа" width="20" height="20"></button>
+        </div>
+
+        <div class="backlog-list">
+            <ul id="ul">
+
+            </ul>
+        </div>
+    </div>
+</section>
+
+<script src="main.js"></script>
+</body>
+</html>
