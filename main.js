@@ -2,6 +2,9 @@ const USERS_URL = 'src/file/users.json'
 const TASKS_URL = 'src/file/tasks.json'
 const VISIBLE_DAYS = 15
 
+const tasks = []
+const users = []
+
 class Task {
     constructor(taskJson) {
         this.id = taskJson.id
@@ -21,8 +24,6 @@ class User {
         this.surname = taskJson.surname
         this.firstName = taskJson.firstName
         this.secondName = taskJson.secondName
-
-        this.tasks = []
     }
 }
 
@@ -39,8 +40,10 @@ async function loadTasks(url) {
 }
 
 async function initApp() {
-    const users = await loadUsers(USERS_URL)
-    const tasks = await loadTasks(TASKS_URL)
+    const loadedUsers = await loadUsers(USERS_URL)
+    const loadedTasks = await loadTasks(TASKS_URL)
+    users.push(...loadedUsers)
+    tasks.push(...loadedTasks)
 
     //console.log(tasks)
     //console.log(users)
@@ -50,14 +53,10 @@ async function initApp() {
     })
 
     tasks.forEach(task => {
-        if (task.executor !== null) {
-            const user = users.find(user => user.id === task.executor)
-            user.tasks.push(task)
-        }
-
         taskRender(task)
     })
 
+    findExecutor(tasks, users)
     assignmentTask()
 }
 
@@ -68,7 +67,7 @@ function taskRender(task) {
     const taskElement = document.createElement('li')
     taskElement.classList.add('list-item')
     taskElement.id = task.id
-    taskElement.setAttribute('draggable', true)
+    taskElement.setAttribute('draggable', 'true')
 
     //taskElement.dataset.tooltip = task.subject +'. Дата начала: ' + task.planStartDate
     taskElement.dataset.tooltip = 'Всплывающая подсказка'
@@ -85,9 +84,20 @@ function taskRender(task) {
         taskDesc.innerHTML = 'Краткое описание задачи'
     }
 
-    taskWrapper.prepend(taskElement)
+    taskWrapper.append(taskElement)
     taskElement.prepend(taskHeader)
     taskElement.append(taskDesc)
+}
+
+function findExecutor(tasks, users) {
+    console.log(tasks)
+    console.log(users)
+
+    tasks.forEach((task) => {
+        if(task.executor !== null) {
+            console.log(1)
+        }
+    })
 }
 
 function addUserRow(user) {
@@ -97,6 +107,7 @@ function addUserRow(user) {
     for (let i = 0; i < VISIBLE_DAYS; i++) {
         let cell = document.createElement('ul')
         cell.classList.add('task-place')
+        //cell.setAttribute('draggable', 'false')
         //cell.innerHTML = `Задача`
         cell.dataset.userId = user.id
         cell.dataset.date = dates[i].dataset.date
@@ -141,75 +152,102 @@ function dateRender(startDate) {
 }
 
 function assignmentTask() {
-    document.addEventListener('mousedown', function(event) {
-        const activeTaskItem = event.target.closest('.list-item')
-        const taskPlaces = document.querySelectorAll('.task-place')
+    let draggedItem = null
 
-        activeTaskItem.addEventListener('dragstart', dragstart)
-        activeTaskItem.addEventListener('dragend', dragend)
-
-        for (const taskPlace of taskPlaces) {
-            taskPlace.addEventListener('dragover', dragover)
-            taskPlace.addEventListener('dragenter', dragenter)
-            taskPlace.addEventListener('dragleave', dragleave)
-            taskPlace.addEventListener('drop', dragdrop)
-        }
+    const tasksItems = document.querySelectorAll('.list-item')
+    for (const item of tasksItems) {
+        item.addEventListener('dragstart', dragstart)
+        item.addEventListener('dragend', dragend)
 
         function dragstart(event) {
-            event.target.classList.add('active')
-            setTimeout(() => event.target.classList.add('hide'), 0)
+            draggedItem = event.target
+            draggedItem.classList.add('active')
+            setTimeout(() => draggedItem.classList.add('hide'), 0)
         }
 
         function dragend(event) {
-            event.target.classList.remove('active', 'hide')
+            draggedItem.classList.remove('active', 'hide')
+            draggedItem = null
+        }
+    }
+
+    const taskPlaces = document.querySelectorAll('.task-place')
+    for (const taskPlaceCell of taskPlaces) {
+        //console.log(taskPlaceCell)
+        taskPlaceCell.addEventListener('dragover', dragover)
+        taskPlaceCell.addEventListener('dragenter', dragenter)
+        taskPlaceCell.addEventListener('dragleave', dragleave)
+        taskPlaceCell.addEventListener('drop', dragdrop)
+    }
+
+/*    const taskPlacesName = document.querySelectorAll('.name-item')
+    for (const taskPlaceName of taskPlacesName) {
+        //console.log(taskPlaceName)
+        taskPlaceName.addEventListener('dragover', dragover)
+        taskPlaceName.addEventListener('dragenter', dragenter)
+        taskPlaceName.addEventListener('dragleave', dragleave)
+        taskPlaceName.addEventListener('drop', dragdrop)
+    }*/
+
+    function dragover(event) {
+        event.preventDefault()
+    }
+
+    function dragenter(event) {
+        if (!draggedItem) {
+            return
         }
 
-        function dragover(event) {
-            event.preventDefault()
+        event.target.classList.add('hover')
+    }
+
+    function dragleave(event) {
+        if (!draggedItem) {
+            return
         }
 
-        function dragenter(event) {
-            event.target.classList.add('hover')
+        event.target.classList.remove('hover')
+    }
+
+    function dragdrop(event) {
+        const taskPlace = event.target.closest('.task-place')
+
+        if (!draggedItem || !taskPlace) {
+            return
         }
 
-        function dragleave(event) {
-            event.target.classList.remove('hover')
+        taskPlace.append(draggedItem)
+        taskPlace.classList.remove('hover')
+
+/*        const taskPlaceName = event.target.closest('.name-item')
+
+        if (!draggedItem || !taskPlaceName) {
+            return
         }
 
-        function dragdrop(event) {
-            event.target.append(activeTaskItem)
-            //console.log(activeTaskItem)
-            event.target.classList.remove('hover')
-        }
-    })
+        taskPlaceName.append(draggedItem)
+        taskPlaceName.classList.remove('hover')*/
+    }
 }
 
-function turnPage() {
+function pagination() {
     const prev = document.querySelector('.prev')
     const next = document.querySelector('.next')
 
-    prev.onclick = function() {
+    prev.addEventListener('click', function () {
         console.log('клик назад')
-        /*пеерерисовка*/
-        //startDate.setDate(startDate.getDate() - halfVisibleDays * 2)
-        //dateRender(startDate)
-    }
+    })
 
-    next.onclick = function() {
+    next.addEventListener('click', function () {
         console.log('клик вперед')
-        /*пеерерисовка*/
-        //startDate.setDate(startDate.getDate() - halfVisibleDays * 2)
-        //dateRender(startDate)
-    }
+    })
 }
 
 const halfVisibleDays = Math.floor(VISIBLE_DAYS / 2)
 const startDate = new Date()
 startDate.setDate(startDate.getDate() - halfVisibleDays)
 
-turnPage()
+pagination()
 dateRender(startDate)
 
-
 initApp()
-

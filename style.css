@@ -80,6 +80,8 @@ body {
     justify-content: center;
     align-items: stretch;
     border: 1px dashed #eeeeee;
+
+    overflow: hidden;
 }
 
 .task-place .task-description {
@@ -88,6 +90,12 @@ body {
 
 .task-place .list-item {
     margin-bottom: 0;
+    padding: 10px 3px;
+}
+
+.task-place li {
+    width: 100%;
+    /*max-width: 100%;*/
 }
 
 .hover {
@@ -188,6 +196,15 @@ button:hover {
     color: #548ab8;
     font-weight: bold;
     margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.task-place .source {
+    font-size: 0.9em;
+}
+
+#tasks-box [data-tooltip]::after {
+    display: none;
 }
 
 [data-tooltip] {
