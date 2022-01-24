@@ -11,7 +11,6 @@ class Task {
         this.subject = taskJson.subject
         this.description = taskJson.description
         this.executor = taskJson.executor
-        this.creationDate = taskJson.creationDate //потом по этому полю можно отсортировать в бэклоге
         this.planStartDate = taskJson.planStartDate
         this.planEndDate = taskJson.planEndDate
     }
@@ -62,40 +61,64 @@ async function initApp() {
 
 
 function taskRender(task) {
-    const taskWrapper = document.getElementById('ul')
-
+    const taskWrapper = document.getElementById('backlog-list-item')
     const taskElement = document.createElement('li')
-    taskElement.classList.add('list-item')
-    taskElement.id = task.id
-    taskElement.setAttribute('draggable', 'true')
-
-    //taskElement.dataset.tooltip = task.subject +'. Дата начала: ' + task.planStartDate
-    taskElement.dataset.tooltip = 'Всплывающая подсказка'
-
     const taskHeader = document.createElement('span')
-    taskHeader.innerHTML = task.subject
-    taskHeader.classList.add('source')
-
     const taskDesc = document.createElement('span')
-    taskDesc.innerHTML = task.description
-    taskDesc.classList.add('task-description')
 
-    if (task.description === '') {
-        taskDesc.innerHTML = 'Краткое описание задачи'
+    if (task.executor === null) { /*если не указан исполнитель*/
+        taskElement.classList.add('list-item')
+        //taskElement.id = task.id
+        taskElement.setAttribute('draggable', 'true')
+
+        /*всплывающая подсказка*/
+        //taskElement.dataset.tooltip = task.subject +'. Дата начала: ' + task.planStartDate
+        taskElement.dataset.tooltip = 'Всплывающая подсказка'
+
+        /*название задачи*/
+        taskHeader.innerHTML = task.subject
+        taskHeader.classList.add('source')
+
+        /*описание задачи*/
+        taskDesc.innerHTML = task.description
+        taskDesc.classList.add('task-description')
+
+        if (task.description === '') {
+            //taskDesc.innerHTML = 'Краткое описание задачи'
+            taskDesc.innerHTML = task.planStartDate
+        }
     }
 
     taskWrapper.append(taskElement)
-    taskElement.prepend(taskHeader)
+    taskElement.append(taskHeader)
     taskElement.append(taskDesc)
 }
 
 function findExecutor(tasks, users) {
-    console.log(tasks)
-    console.log(users)
-
     tasks.forEach((task) => {
-        if(task.executor !== null) {
-            console.log(1)
+        if(task.executor !== null) { //если у задачи указан исполнитель
+            users.forEach((user) => {
+                if (user.id === task.executor) { // если id юзера и задачи совпадают
+                    /*закинуть задачу юзеру на нужную дату*/
+                    let taskPlace = document.querySelectorAll('.task-place')
+
+                    taskPlace.forEach((cell) => {
+                        if ((task.planStartDate === cell.dataset.date) &&(+task.executor === +cell.dataset.userId)) {
+                            const taskElement = document.createElement('li')
+                            const taskHeader = document.createElement('span')
+
+                            taskElement.classList.add('list-item')
+                            taskElement.setAttribute('draggable', 'true')
+
+                            taskHeader.innerHTML = task.subject
+                            taskHeader.classList.add('source')
+
+                            cell.append(taskElement)
+                            taskElement.append(taskHeader)
+                        }
+                    })
+                }
+            })
         }
     })
 }
@@ -107,8 +130,6 @@ function addUserRow(user) {
     for (let i = 0; i < VISIBLE_DAYS; i++) {
         let cell = document.createElement('ul')
         cell.classList.add('task-place')
-        //cell.setAttribute('draggable', 'false')
-        //cell.innerHTML = `Задача`
         cell.dataset.userId = user.id
         cell.dataset.date = dates[i].dataset.date
 
@@ -137,7 +158,7 @@ function dateRender(startDate) {
     for (let i = 0; i < VISIBLE_DAYS; i++) {
         const dateItem = document.createElement('div')
         dateItem.classList.add('date-item')
-        dateItem.innerText = currentDate.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit'})
+        dateItem.innerText = currentDate.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit'}) /*weekday: 'short'*/
         const dateStr = currentDate.toISOString().split('T')[0]
         dateItem.dataset.date = dateStr
 
@@ -173,21 +194,11 @@ function assignmentTask() {
 
     const taskPlaces = document.querySelectorAll('.task-place')
     for (const taskPlaceCell of taskPlaces) {
-        //console.log(taskPlaceCell)
         taskPlaceCell.addEventListener('dragover', dragover)
         taskPlaceCell.addEventListener('dragenter', dragenter)
         taskPlaceCell.addEventListener('dragleave', dragleave)
         taskPlaceCell.addEventListener('drop', dragdrop)
     }
-
-/*    const taskPlacesName = document.querySelectorAll('.name-item')
-    for (const taskPlaceName of taskPlacesName) {
-        //console.log(taskPlaceName)
-        taskPlaceName.addEventListener('dragover', dragover)
-        taskPlaceName.addEventListener('dragenter', dragenter)
-        taskPlaceName.addEventListener('dragleave', dragleave)
-        taskPlaceName.addEventListener('drop', dragdrop)
-    }*/
 
     function dragover(event) {
         event.preventDefault()
@@ -218,15 +229,6 @@ function assignmentTask() {
 
         taskPlace.append(draggedItem)
         taskPlace.classList.remove('hover')
-
-/*        const taskPlaceName = event.target.closest('.name-item')
-
-        if (!draggedItem || !taskPlaceName) {
-            return
-        }
-
-        taskPlaceName.append(draggedItem)
-        taskPlaceName.classList.remove('hover')*/
     }
 }
 
