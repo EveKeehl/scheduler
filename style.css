@@ -80,6 +80,7 @@ body {
     justify-content: center;
     align-items: stretch;
     border: 1px dashed #eeeeee;
+    flex-direction: column;
 
     overflow: hidden;
 }
@@ -91,6 +92,8 @@ body {
 .task-place .list-item {
     margin-bottom: 0;
     padding: 10px 3px;
+    height: 100%;
+    justify-content: center;
 }
 
 .task-place li {

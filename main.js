@@ -75,6 +75,9 @@ function taskRender(task) {
         //taskElement.dataset.tooltip = task.subject +'. Дата начала: ' + task.planStartDate
         taskElement.dataset.tooltip = 'Всплывающая подсказка'
 
+        /*дата*/
+        taskElement.dataset.date = task.planStartDate
+
         /*название задачи*/
         taskHeader.innerHTML = task.subject
         taskHeader.classList.add('source')
@@ -194,14 +197,22 @@ function assignmentTask() {
 
     const taskPlaces = document.querySelectorAll('.task-place')
     for (const taskPlaceCell of taskPlaces) {
-        taskPlaceCell.addEventListener('dragover', dragover)
-        taskPlaceCell.addEventListener('dragenter', dragenter)
-        taskPlaceCell.addEventListener('dragleave', dragleave)
-        taskPlaceCell.addEventListener('drop', dragdrop)
+        taskPlaceCell.addEventListener('dragover', dragover) //вызывается когда мы находимся над местом, куда можно поместить элемент
+        taskPlaceCell.addEventListener('dragenter', dragenter) //заходим на территорию конкретного taskPlaceCell
+        taskPlaceCell.addEventListener('dragleave', dragleave) //перетащили но вышли за территорию
+        taskPlaceCell.addEventListener('drop', dragdrop) //отпустили
+    }
+
+    const taskNamePlaces = document.querySelectorAll('.name-item')
+    for (const taskNamePlacesCell of taskNamePlaces) {
+        taskNamePlacesCell.addEventListener('dragover', dragover)
+        taskNamePlacesCell.addEventListener('dragenter', dragenter)
+        taskNamePlacesCell.addEventListener('dragleave', dragleave)
+        taskNamePlacesCell.addEventListener('drop', dragdrop2)
     }
 
     function dragover(event) {
-        event.preventDefault()
+        event.preventDefault() // чтобы dragdrop работал
     }
 
     function dragenter(event) {
@@ -230,6 +241,14 @@ function assignmentTask() {
         taskPlace.append(draggedItem)
         taskPlace.classList.remove('hover')
     }
+
+    function dragdrop2(event) {
+        const taskPlaceForName = document.querySelector(`.task-place[data-date="${draggedItem.dataset.date}"][data-user-id="${event.target.dataset.userId}"]`)
+
+        taskPlaceForName.append(draggedItem)
+
+        event.target.classList.remove('hover')
+    }
 }
 
 function pagination() {
@@ -247,6 +266,7 @@ function pagination() {
 
 const halfVisibleDays = Math.floor(VISIBLE_DAYS / 2)
 const startDate = new Date()
+//const startDate = new Date(2022, 1, 20)
 startDate.setDate(startDate.getDate() - halfVisibleDays)
 
 pagination()
