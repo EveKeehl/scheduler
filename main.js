@@ -1,5 +1,6 @@
 const USERS_URL = 'src/file/users.json'
-const TASKS_URL = 'src/file/tasks.json'
+//const TASKS_URL = 'src/file/tasks.json'
+const TASKS_URL = 'src/file/TESTtasks.json'
 const VISIBLE_DAYS = 15
 
 const tasks = []
@@ -83,12 +84,12 @@ function taskRender(task) {
         taskHeader.classList.add('source')
 
         /*описание задачи*/
-        taskDesc.innerHTML = task.description
+        taskDesc.innerHTML = `${task.description}, ${task.planStartDate}`
         taskDesc.classList.add('task-description')
 
         if (task.description === '') {
-            //taskDesc.innerHTML = 'Краткое описание задачи'
-            taskDesc.innerHTML = task.planStartDate
+            taskDesc.innerHTML = `Краткое описание задачи, ${task.planStartDate}`
+            //taskDesc.innerHTML = task.planStartDate
         }
     }
 
@@ -245,31 +246,77 @@ function assignmentTask() {
     function dragdrop2(event) {
         const taskPlaceForName = document.querySelector(`.task-place[data-date="${draggedItem.dataset.date}"][data-user-id="${event.target.dataset.userId}"]`)
 
+        if (!taskPlaceForName) {
+            event.target.classList.remove('hover')
+            return //выйдет, если не нашел "видимой" даты
+        }
+
         taskPlaceForName.append(draggedItem)
 
         event.target.classList.remove('hover')
     }
 }
 
-function pagination() {
+function pagination(users) {
     const prev = document.querySelector('.prev')
     const next = document.querySelector('.next')
 
     prev.addEventListener('click', function () {
         console.log('клик назад')
+        clearDate()
+        clearTaskPlace()
+
+        let newStartDate = startDate
+        newStartDate.setDate(newStartDate.getDate() - halfVisibleDays)
+        dateRender(newStartDate)
+
+        users.forEach(user => {
+            addUserRow(user)
+        })
+
+        findExecutor(tasks, users)
+
+        assignmentTask()
     })
 
     next.addEventListener('click', function () {
         console.log('клик вперед')
+        clearDate()
+        clearTaskPlace()
+
+        let newStartDate = startDate
+        newStartDate.setDate(newStartDate.getDate() + halfVisibleDays)
+        dateRender(newStartDate)
+
+        users.forEach(user => {
+            addUserRow(user)
+        })
+
+        findExecutor(tasks, users)
+
+        assignmentTask()
     })
 }
 
+function clearDate() {
+    const dateItemList = document.querySelectorAll('.date-item')
+    for (const dateItem of dateItemList) {
+        dateItem.remove()
+    }
+}
+
+function clearTaskPlace() {
+    const taskItemList = document.querySelectorAll('.task-place')
+    for (const taskItem of taskItemList) {
+        taskItem.remove()
+    }
+}
+
 const halfVisibleDays = Math.floor(VISIBLE_DAYS / 2)
-const startDate = new Date()
-//const startDate = new Date(2022, 1, 20)
+let startDate = new Date()
 startDate.setDate(startDate.getDate() - halfVisibleDays)
 
-pagination()
+pagination(users)
 dateRender(startDate)
 
 initApp()

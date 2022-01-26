@@ -231,19 +231,19 @@ button:hover {
     top: 1em;
 }
 
-@media screen and (max-width: 1199px) {}
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 1199px) {
     .backlog {
         max-width: 300px;
+    }
+}
+@media screen and (max-width: 991px) {
+    .backlog {
+        display: none;
     }
     [data-tooltip]::after {
         width: 200px;
     }
 }
-@media screen and (max-width: 767px) {
-    .backlog {
-        display: none;
-    }
-}
+@media screen and (max-width: 767px) {}
 @media screen and (max-width: 575px) {}
 @media screen and (max-width: 319px) {}
