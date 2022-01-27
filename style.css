@@ -126,7 +126,7 @@ body {
 
 .backlog {
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
     background: #d7d7d7;
     padding: 5px;
     /*overflow-y: scroll;

@@ -157,7 +157,7 @@ function userRender(user) {
 function dateRender(startDate) {
     const todayStr = (new Date()).toISOString().split('T')[0]
     const dateList = document.getElementById('date-box')
-    const currentDate = startDate
+    const currentDate = new Date(startDate.getTime());
 
     for (let i = 0; i < VISIBLE_DAYS; i++) {
         const dateItem = document.createElement('div')
@@ -257,45 +257,32 @@ function assignmentTask() {
     }
 }
 
-function pagination(users) {
+function pagination() {
     const prev = document.querySelector('.prev')
     const next = document.querySelector('.next')
 
-    prev.addEventListener('click', function () {
-        console.log('клик назад')
-        clearDate()
-        clearTaskPlace()
+    prev.addEventListener('click', () => {
+        currentPageStartDate.setDate(currentPageStartDate.getDate() - halfVisibleDays)
+        renderPage()
+    })
+    next.addEventListener('click',() => {
+        currentPageStartDate.setDate(currentPageStartDate.getDate() + halfVisibleDays)
+        renderPage()
+    })
+}
 
-        let newStartDate = startDate
-        newStartDate.setDate(newStartDate.getDate() - halfVisibleDays)
-        dateRender(newStartDate)
+function renderPage() {
+    clearDate()
+    clearTaskPlace()
 
-        users.forEach(user => {
-            addUserRow(user)
-        })
-
-        findExecutor(tasks, users)
-
-        assignmentTask()
+    dateRender(currentPageStartDate)
+    users.forEach(user => {
+        addUserRow(user)
     })
 
-    next.addEventListener('click', function () {
-        console.log('клик вперед')
-        clearDate()
-        clearTaskPlace()
+    findExecutor(tasks, users)
 
-        let newStartDate = startDate
-        newStartDate.setDate(newStartDate.getDate() + halfVisibleDays)
-        dateRender(newStartDate)
-
-        users.forEach(user => {
-            addUserRow(user)
-        })
-
-        findExecutor(tasks, users)
-
-        assignmentTask()
-    })
+    assignmentTask()
 }
 
 function clearDate() {
@@ -313,10 +300,10 @@ function clearTaskPlace() {
 }
 
 const halfVisibleDays = Math.floor(VISIBLE_DAYS / 2)
-let startDate = new Date()
-startDate.setDate(startDate.getDate() - halfVisibleDays)
+let currentPageStartDate = new Date()
+currentPageStartDate.setDate(currentPageStartDate.getDate() - halfVisibleDays)
 
-pagination(users)
-dateRender(startDate)
+dateRender(currentPageStartDate)
+pagination()
 
 initApp()
