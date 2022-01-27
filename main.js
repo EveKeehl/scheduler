@@ -45,9 +45,6 @@ async function initApp() {
     users.push(...loadedUsers)
     tasks.push(...loadedTasks)
 
-    //console.log(tasks)
-    //console.log(users)
-
     users.forEach(user => {
         userRender(user)
     })
@@ -60,30 +57,24 @@ async function initApp() {
     assignmentTask()
 }
 
-
 function taskRender(task) {
     const taskWrapper = document.getElementById('backlog-list-item')
     const taskElement = document.createElement('li')
     const taskHeader = document.createElement('span')
     const taskDesc = document.createElement('span')
 
-    if (task.executor === null) { /*если не указан исполнитель*/
+    if (task.executor === null) {
         taskElement.classList.add('list-item')
-        //taskElement.id = task.id
         taskElement.setAttribute('draggable', 'true')
 
-        /*всплывающая подсказка*/
         //taskElement.dataset.tooltip = task.subject +'. Дата начала: ' + task.planStartDate
         taskElement.dataset.tooltip = 'Всплывающая подсказка'
 
-        /*дата*/
         taskElement.dataset.date = task.planStartDate
 
-        /*название задачи*/
         taskHeader.innerHTML = task.subject
         taskHeader.classList.add('source')
 
-        /*описание задачи*/
         taskDesc.innerHTML = `${task.description}, ${task.planStartDate}`
         taskDesc.classList.add('task-description')
 
@@ -100,10 +91,9 @@ function taskRender(task) {
 
 function findExecutor(tasks, users) {
     tasks.forEach((task) => {
-        if(task.executor !== null) { //если у задачи указан исполнитель
+        if(task.executor !== null) {
             users.forEach((user) => {
-                if (user.id === task.executor) { // если id юзера и задачи совпадают
-                    /*закинуть задачу юзеру на нужную дату*/
+                if (user.id === task.executor) {
                     let taskPlace = document.querySelectorAll('.task-place')
 
                     taskPlace.forEach((cell) => {
@@ -198,10 +188,10 @@ function assignmentTask() {
 
     const taskPlaces = document.querySelectorAll('.task-place')
     for (const taskPlaceCell of taskPlaces) {
-        taskPlaceCell.addEventListener('dragover', dragover) //вызывается когда мы находимся над местом, куда можно поместить элемент
-        taskPlaceCell.addEventListener('dragenter', dragenter) //заходим на территорию конкретного taskPlaceCell
-        taskPlaceCell.addEventListener('dragleave', dragleave) //перетащили но вышли за территорию
-        taskPlaceCell.addEventListener('drop', dragdrop) //отпустили
+        taskPlaceCell.addEventListener('dragover', dragover)
+        taskPlaceCell.addEventListener('dragenter', dragenter)
+        taskPlaceCell.addEventListener('dragleave', dragleave)
+        taskPlaceCell.addEventListener('drop', dragdrop)
     }
 
     const taskNamePlaces = document.querySelectorAll('.name-item')
@@ -213,7 +203,7 @@ function assignmentTask() {
     }
 
     function dragover(event) {
-        event.preventDefault() // чтобы dragdrop работал
+        event.preventDefault()
     }
 
     function dragenter(event) {
@@ -248,7 +238,7 @@ function assignmentTask() {
 
         if (!taskPlaceForName) {
             event.target.classList.remove('hover')
-            return //выйдет, если не нашел "видимой" даты
+            return
         }
 
         taskPlaceForName.append(draggedItem)
@@ -265,6 +255,7 @@ function pagination() {
         currentPageStartDate.setDate(currentPageStartDate.getDate() - halfVisibleDays)
         renderPage()
     })
+
     next.addEventListener('click',() => {
         currentPageStartDate.setDate(currentPageStartDate.getDate() + halfVisibleDays)
         renderPage()
@@ -276,12 +267,12 @@ function renderPage() {
     clearTaskPlace()
 
     dateRender(currentPageStartDate)
+
     users.forEach(user => {
         addUserRow(user)
     })
 
     findExecutor(tasks, users)
-
     assignmentTask()
 }
 
